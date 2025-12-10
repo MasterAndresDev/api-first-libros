@@ -1,0 +1,93 @@
+openapi: 3.1.1
+info:
+  title: API de Registro de Libros
+  version: 1.0.0
+  description: >
+    API FIRST para registrar libros usando validación automática mediante
+    express-openapi-validator. Este archivo define toda la estructura que
+    el servidor seguirá al validar solicitudes.
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /libros:
+    post:
+      summary: Registrar un nuevo libro
+      description: Crea un libro nuevo validando los 3 campos definidos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LibroInput"
+
+      responses:
+        "201":
+          description: Libro registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Libro"
+
+        "400":
+          description: Error de validación (Bad Request)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+# ============================================================
+#  Definición de Esquemas
+# ============================================================
+components:
+  schemas:
+    # === LibroInput ===
+    # Datos requeridos para registrar un libro
+    LibroInput:
+      type: object
+      required:
+        - titulo
+        - clave
+        - autor
+      properties:
+        titulo:
+          type: string
+          minLength: 5 # regla del examen
+          description: Título del libro
+        clave:
+          type: string
+          minLength: 8 # regla del examen
+          maxLength: 8 # exacto 8 caracteres
+          description: Clave única (similar a un ISBN simplificado)
+        autor:
+          type: string
+          minLength: 3 # regla del examen
+          description: Nombre del autor
+
+    # === Libro ===
+    # Representación del libro registrado
+    Libro:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID autogenerado en el servidor
+        titulo:
+          type: string
+        clave:
+          type: string
+        autor:
+          type: string
+
+    # === ErrorResponse ===
+    # Para errores del validador OpenAPI
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
