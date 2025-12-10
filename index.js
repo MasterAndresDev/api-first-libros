@@ -40,7 +40,7 @@ app.use('/docs', swaggerui.serve, swaggerui.setup(openapiDocument));
 // ============================================================
 app.use(
   openApiValidator({
-    apiSpec: openapiDocument,
+    apiSpec: openapiDocument, // Ahora usa el documento cargado, no una ruta
     validateRequests: true,
     validateResponses: false, // Para este examen no se requiere validar respuesta
     ignorePaths: /\/docs\/.*/, // Evita validar la documentación
