@@ -1,11 +1,9 @@
 openapi: 3.1.1
 info:
   title: API de Registro de Libros
-  version: 1.0.0
+  version: 1.1.0
   description: >
-    API FIRST para registrar libros usando validación automática mediante
-    express-openapi-validator. Este archivo define toda la estructura que
-    el servidor seguirá al validar solicitudes.
+    API FIRST para registrar, consultar y actualizar libros usando validación automática.
 
 servers:
   - url: http://localhost:3000
@@ -14,14 +12,12 @@ paths:
   /libros:
     post:
       summary: Registrar un nuevo libro
-      description: Crea un libro nuevo validando los 3 campos definidos.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/LibroInput"
-
       responses:
         "201":
           description: Libro registrado exitosamente
@@ -29,21 +25,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Libro"
-
         "400":
-          description: Error de validación (Bad Request)
+          description: Error de validación
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-# ============================================================
-#  Definición de Esquemas
-# ============================================================
+  /libros/{id}:
+    get:
+      summary: Obtener libro por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Libro encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Libro"
+        "400":
+          description: ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: Actualizar libro por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LibroInput"
+      responses:
+        "200":
+          description: Libro actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Libro"
+        "400":
+          description: ID inválido o datos incorrectos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Libro no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
-    # === LibroInput ===
-    # Datos requeridos para registrar un libro
     LibroInput:
       type: object
       required:
@@ -53,26 +106,20 @@ components:
       properties:
         titulo:
           type: string
-          minLength: 5 # regla del examen
-          description: Título del libro
+          minLength: 5
         clave:
           type: string
-          minLength: 8 # regla del examen
-          maxLength: 8 # exacto 8 caracteres
-          description: Clave única (similar a un ISBN simplificado)
+          minLength: 8
+          maxLength: 8
         autor:
           type: string
-          minLength: 3 # regla del examen
-          description: Nombre del autor
+          minLength: 3
 
-    # === Libro ===
-    # Representación del libro registrado
     Libro:
       type: object
       properties:
         id:
           type: integer
-          description: ID autogenerado en el servidor
         titulo:
           type: string
         clave:
@@ -80,8 +127,6 @@ components:
         autor:
           type: string
 
-    # === ErrorResponse ===
-    # Para errores del validador OpenAPI
     ErrorResponse:
       type: object
       properties:

@@ -74,6 +74,49 @@ app.post('/libros', (req, res) => {
   res.status(201).json(nuevoLibro);
 });
 
+app.get('/libros/:id', (req, res) => {
+  const libroId = parseInt(req.params.id);
+
+  if (isNaN(libroId) || libroId < 1) {
+    return res.status(400).json({ message: 'ID inválido', errors: [] });
+  }
+
+  const libro = libros.find(l => l.id === libroId);
+
+  if (!libro) {
+    return res.status(404).json({ message: 'Libro no encontrado', errors: [] });
+  }
+
+  res.json(libro);
+});
+
+
+app.put('/libros/:id', (req, res) => {
+  const libroId = parseInt(req.params.id);
+
+  if (isNaN(libroId) || libroId < 1) {
+    return res.status(400).json({ message: 'ID inválido', errors: [] });
+  }
+
+  const index = libros.findIndex(l => l.id === libroId);
+
+  if (index === -1) {
+    return res.status(404).json({ message: 'Libro no encontrado', errors: [] });
+  }
+
+  // Si llegó aquí, openapi-validator ya validó los datos
+  const libroActualizado = {
+    id: libroId,
+    titulo: req.body.titulo,
+    clave: req.body.clave,
+    autor: req.body.autor
+  };
+
+  libros[index] = libroActualizado;
+
+  res.json(libroActualizado);
+});
+
 // ============================================================
 // Middleware de manejo de errores
 //
